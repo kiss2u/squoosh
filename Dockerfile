@@ -24,7 +24,7 @@ FROM nginx:alpine
 COPY --from=builder /app/packages/app/dist /usr/share/nginx/html
 
 # 可选：自定义 Nginx 配置（如需支持 SPA 路由，可取消注释并准备 nginx.conf）
-# COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
