@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  squoosh:
+    image: ghcr.io/kiss2u/squoosh:latest
+    container_name: squoosh
+    ports:
+      - "8080:80"
+    restart: unless-stopped
