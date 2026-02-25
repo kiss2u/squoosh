@@ -1,27 +1,32 @@
-# 构建阶段
 FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# 复制根目录的 package 文件
+# Copy package files
 COPY package*.json ./
 
-# 复制所有子包的 package.json 及源代码（整个 packages 目录）
-COPY packages/ ./packages/
+# Copy all project files
+COPY . .
 
-# 安装依赖
+# Install dependencies
 RUN npm ci
 
-# 构建应用（生成静态文件到 packages/app/dist）
+# Build application (generates intermediate files first, then move-output.js processes them)
 RUN npm run build
 
-# 运行阶段
+# After npm run build, move-output.js should have renamed .tmp/build/static to build/
+# But since the build script includes move-output.js, the final artifacts should be in the correct place.
+# Looking more carefully at the move script, it moves .tmp/build/static to 'build' directory in root.
+# Let's ensure the 'build' directory exists and copy from there.
+
 FROM nginx:alpine
 
-COPY --from=builder /app/packages/app/dist /usr/share/nginx/html
-
-# 可选：自定义 Nginx 配置（如需支持 SPA 路由）
+# Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy built assets from builder stage
+# After the full build process (rollup + move-output.js), assets are in 'build' directory
+COPY --from=builder /app/build /usr/share/nginx/html
 
 EXPOSE 80
 
