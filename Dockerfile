@@ -21,9 +21,6 @@ RUN npm run build
 
 FROM nginx:alpine
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
 # Copy built assets from builder stage
 # After the full build process (rollup + move-output.js), assets are in 'build' directory
 COPY --from=builder /app/build /usr/share/nginx/html
